@@ -1,0 +1,133 @@
+---
+title: "Series 5"
+author: "19-747-096 Jan Heinrich Schlegel"
+date: "2022-10-18"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE, dpi = 180, fig.width = 8, fig.height = 5)
+if (!require(tidymodels)) install.packages("tidymodels")
+if (!require(tidyverse)) install.packages("tidyverse")
+if (!require(tidytext)) install.packages("tidytext")
+if (!require(purrr)) install.packages("purrr")
+if (!require(GGally)) install.packages("GGally")
+if (!require(readr)) install.packages("readr")
+if (!require(janitor)) install.packages("janitor")
+if (!require(doParallel)) install.packages("doParallel")
+if (!require(plotly)) install.packages("plotly")
+theme_set(theme_light())
+```
+
+## Problem 18
+```{r}
+set.seed(1)
+rand_sample <- rlnorm(20, 5, 4)
+n <- 100
+mu_grid <- seq(3, 8, l = n)
+sigma_grid <- seq(2, 6, l = n)
+grid <- as.matrix(expand.grid(mu_grid, sigma_grid))
+lik <- function(grid)prod(dlnorm(rand_sample, grid[1], grid[2]))
+lik_vec <- matrix(apply(grid, 1, FUN = lik))
+max_lik <- max(lik_vec)
+grid_lik <- data.frame(grid, lik_vec/max_lik)
+# divide by max_lik to normalize likelihood values; without normalizing likelihood values very small
+colnames(grid_lik) <- c("mu", "sigma", "lik")
+max_lik_par <- grid_lik[which.max(grid_lik$lik), c(1,2)]
+max_lik_par
+
+## Using contour:
+contour(x = mu_grid, y = sigma_grid, z = matrix(grid_lik$lik, n, n), levels = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9), main = "Contour Lines of Log Normal", xlab = expression(mu), ylab = expression(sigma))
+points(max_lik_par, col = "red", pch = 16, cex = 0.6)
+text(max_lik_par, col = "red", cex = 0.7, pos = 4, labels = "MLE")
+```
+
+
+```{r, include = FALSE}
+## Using plot_ly
+plot_ly(x = grid_lik$mu, y = grid_lik$sigma, z = grid_lik$lik, type = "contour", contours = list(showlabels = TRUE)) %>% 
+  layout(title = "Contour Lines of Log Normal", xaxis = list(title = TeX("\\mu")), yaxis = list(title = TeX("\\sigma"))) %>% 
+  config(mathjax = "cdn")
+```
+
+```{r, include = FALSE}
+plot_ly(x = mu_grid, y = sigma_grid, z = matrix(grid_lik$lik, n, n)) %>% 
+  add_surface()
+```
+
+## Problem 20
+```{r}
+# c)
+x1 <- 6; n1 <- 108; x2<- 12; n2<- 113
+lik <- function(psi, eta)exp(psi+eta)^x1*(1/(1+exp(psi+eta)))^n1*exp(eta)^x2*(1/(1+exp(eta)))^n2
+l_grid <- 200
+psi_grid <- seq(-2, .5, l = l_grid)
+eta_grid <- seq(-3, -1.5, l = l_grid)
+grid <- expand.grid(psi_grid, eta_grid)
+lik_val <- lik(grid$Var1, grid$Var2)
+max_lik <- max(lik_val)
+grid_lik <- data.frame(grid, lik = lik_val/max_lik)
+max_lik_par <- grid_lik[which.max(grid_lik$lik), c(1,2)]
+
+## Relative Log Likelihood
+rel_log_lik <- log(grid_lik$lik)
+
+
+## Profile log-likelihood
+rel_log_lik_fun <- function(psi, eta)log(lik(psi, eta)/max_lik)
+profile_log_lik_df <- data.frame(maximum = numeric(l_grid), objective = numeric(l_grid))
+for (i in 1:l_grid)profile_log_lik_df[i,] <- unlist(optimize(
+  rel_log_lik_fun, interval = range(eta_grid), psi = psi_grid[i], maximum = TRUE
+  ))
+
+
+## Plot Result
+contour(x = psi_grid, y = eta_grid, z = matrix(rel_log_lik, l_grid, l_grid), levels = seq(-0.2, -1.2, by = -.2), main = "Contour Lines of Relative Log Likelihood", xlab = expression(psi), ylab = expression(eta))
+points(max_lik_par, col = "red", pch = 16, cex = 0.6)
+text(max_lik_par, col = "red", cex = 0.7, pos = 4, labels = "MLE")
+lines(psi_grid, profile_log_lik_df[,1], col = 2)
+```
+
+
+## Problem 21
+```{r}
+# b)
+x <- c(225, 175, 198, 189, 189, 103, 162, 135, 119, 162)
+n <- length(x)
+l_grid <- 200
+kappa_grid <- seq(0.1,10, l = l_grid)
+sigma_grid <- seq(0.05, 10, l = l_grid)
+# i)
+lp <- function(kappa){n*log(kappa)-n*log(1/n*sum(x^kappa))+(kappa-1)*sum(log(x))-n}
+profile_log_lik_df <- data.frame(kappa = kappa_grid, pllik = sapply(kappa_grid, lp))
+max_ind <- which.max(profile_log_lik_df$pllik)
+profile_log_lik_df %>% 
+  ggplot(aes(x = kappa, y = pllik))+
+  geom_line()+
+  geom_vline(xintercept = kappa_grid[max_ind], color = "red", lty = 2)+
+  annotate("text", x = kappa_grid[max_ind]-.2, y = -80, angle = 90,
+  label = paste("widehat(kappa[ML])==",kappa_grid[max_ind]),
+  parse = TRUE, color = "red")+
+  labs(x = expression(kappa),
+  y = "profile log likelihood")
+```
+
+```{r}
+# ii)
+optimize(lp, interval = range(kappa_grid), maximum = TRUE)
+```
+
+```{r}
+# iii)
+# ?dweibull
+weibull_logl <- function(params){
+  kappa <- params[1]
+  sigma <- params[2]
+  sum(dweibull(x, shape = kappa, scale= sigma, log = TRUE))
+}
+# use method = "L-BFGS-B to use bounds so that kappa, sigma >0; otherwise NA/ infinity warnings
+optim(c(1,1), weibull_logl, lower = c(1e-10, 1e-10), method = "L-BFGS-B", control = list(fnscale = -1)) # the same up to 3 decimal digits
+```
+
+
+
