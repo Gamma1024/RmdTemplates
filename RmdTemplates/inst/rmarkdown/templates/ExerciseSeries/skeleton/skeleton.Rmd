@@ -1,12 +1,20 @@
 ---
 title: '"Untitled"'
 author: "Jan Heinrich Schlegel"
-date: "`r Sys.Date()`"
-output: html_document
+date: "Last edited `r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE, dpi = 180, fig.width = 8, fig.height = 5)
+```
+
+
+```{r setup libraries, include=FALSE}
 if (!require(tidymodels)) install.packages("tidymodels")
 if (!require(tidyverse)) install.packages("tidyverse")
 if (!require(tidytext)) install.packages("tidytext")
@@ -16,23 +24,25 @@ if (!require(readr)) install.packages("readr")
 if (!require(janitor)) install.packages("janitor")
 if (!require(doParallel)) install.packages("doParallel")
 if (!require(plotly)) install.packages("plotly")
-theme_set(theme_light())
+if (!require(glue)) install.packages("glue")
+
+theme_set(theme_wsj())
 ```
 
 ## Problem
-```{r}
-
-```
-
-
-## Problem
-```{r}
+```{r Problem 1}
 
 ```
 
 
 ## Problem
-```{r}
+```{r Problem 2}
+
+```
+
+
+## Problem
+```{r Problem 3}
 
 ```
 
