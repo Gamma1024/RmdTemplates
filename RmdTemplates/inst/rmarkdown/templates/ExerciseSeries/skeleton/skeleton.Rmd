@@ -27,6 +27,8 @@ if (!require(plotly)) install.packages("plotly")
 if (!require(glue)) install.packages("glue")
 if (!require(ggthemes)) install.packages("ggthemes")
 if (!require(plotly)) install.packages("plotly")
+if (!require(broom)) install.packages("broom")
+
 
 theme_set(theme_wsj())
 ```
