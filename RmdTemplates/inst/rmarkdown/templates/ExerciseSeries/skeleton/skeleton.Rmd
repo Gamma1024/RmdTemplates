@@ -25,6 +25,8 @@ if (!require(janitor)) install.packages("janitor")
 if (!require(doParallel)) install.packages("doParallel")
 if (!require(plotly)) install.packages("plotly")
 if (!require(glue)) install.packages("glue")
+if (!require(ggthemes)) install.packages("ggthemes")
+if (!require(plotly)) install.packages("plotly")
 
 theme_set(theme_wsj())
 ```
