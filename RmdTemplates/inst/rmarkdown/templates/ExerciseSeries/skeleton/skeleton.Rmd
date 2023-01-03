@@ -29,6 +29,15 @@ if (!require(glue)) install.packages("glue")
 theme_set(theme_wsj())
 ```
 
+
+```{r install template, include = FALSE}
+# use devtools::build() to build skeleton
+# devtools::install() to install package
+# library(RmdTemplates) to load template
+# restart
+```
+
+
 ## Problem
 ```{r Problem 1}
 
