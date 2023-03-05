@@ -11,10 +11,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE, dpi = 180, fig.width = 8, fig.height = 5)
-```
-
-
-```{r setup libraries, include=FALSE}
 if (!require(tidymodels)) install.packages("tidymodels")
 if (!require(tidyverse)) install.packages("tidyverse")
 if (!require(tidytext)) install.packages("tidytext")
@@ -59,3 +55,24 @@ theme_set(theme_wsj())
 
 ```
 
+
+
+## Computational Details {-}
+
+```{r pkgs}
+si <- sessionInfo()
+rver <- si$R.version$version.string
+pk1 <- si$basePkgs
+pk2 <- si$otherPkgs
+pk2v <- NULL
+for (package_name in names(pk2)){
+     pk2v <- c(pk2v, paste(package_name, packageVersion(package_name)))
+}
+
+```
+
+* R version: `r rver`
+* Base packages: `r paste(pk1, collapse = ", ")`
+* Other packages: `r paste(pk2v, collapse = ", ")`
+
+This document was generated on `r format(Sys.time(), "%Y-%m-%d at %H:%M")`.
