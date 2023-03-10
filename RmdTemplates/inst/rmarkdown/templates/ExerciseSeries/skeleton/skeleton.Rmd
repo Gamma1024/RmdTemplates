@@ -10,7 +10,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE, warning = FALSE, message = FALSE, dpi = 180, fig.width = 8, fig.height = 5)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, warning = FALSE,
+                      message = FALSE, dpi = 180, fig.width = 8, fig.height = 5)
 if (!require(tidymodels)) install.packages("tidymodels")
 if (!require(tidyverse)) install.packages("tidyverse")
 if (!require(tidytext)) install.packages("tidytext")
@@ -22,6 +23,7 @@ if (!require(doParallel)) install.packages("doParallel")
 if (!require(plotly)) install.packages("plotly")
 if (!require(glue)) install.packages("glue")
 if (!require(ggthemes)) install.packages("ggthemes")
+if (!require(ggforce)) install.packages("ggforce")
 if (!require(plotly)) install.packages("plotly")
 if (!require(broom)) install.packages("broom")
 
